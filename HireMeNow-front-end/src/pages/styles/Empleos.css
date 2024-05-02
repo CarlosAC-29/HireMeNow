@@ -5,38 +5,13 @@
 
 .main-box {
     background-image: url('../../assets/background.png');
+    display: flex;
+    justify-content: center;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     height: 100vh;
+    padding: 5%;
   }
 
-.container {
-    position: flex; /* Se posiciona con respecto a la ventana del navegador */
-    top: 0; /* Establece la distancia desde la parte superior */
-    left: 0; /* Establece la distancia desde la izquierda */
-    width: 100%; /* Ocupa todo el ancho de la ventana */
-    height: 100%; /* Ocupa toda la altura de la ventana */
-    background-color: rgba(54, 115, 170, 0.7); /* Color del contenedor con 70% de opacidad */
-    z-index: 1; /* Asegura que el contenedor esté por encima del fondo */
-  }
-
-  .filter {
-    display: flex;
-    width: 30%;
-    height: 100%;
-  }
-
-  .filter-box {
-    background-color: #FFFFFF;
-    margin: 2rem;
-    width: 100%;
-    border-radius: 5px;
-    padding: 20px;
-  }
-
-  .jobs {
-    display: flex;
-    width: 60%;
-  }

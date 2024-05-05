@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form';
 import { tema, MenuProps } from '../assets/theme';
 import { names } from '../assets/technologies';
 import Swal from 'sweetalert2';
+import { getJobs } from '../api/routes';
 
 function getStyles(name, personName, theme) {
     return {
@@ -34,6 +35,11 @@ function getStyles(name, personName, theme) {
 
 export default function FormPage() {
 
+    const theme = useTheme();
+    const [nivelEducativo, setNivelEducativo] = useState('');
+    const [experencia, setExperencia] = useState('');
+    const [habilidad, setHabilidad] = useState([]);
+
     const { register, handleSubmit, setValue } = useForm(
         {
             defaultValues: {
@@ -45,14 +51,8 @@ export default function FormPage() {
         }
     )
 
-    const theme = useTheme();
-    const [nivelEducativo, setNivelEducativo] = useState('');
-    const [experencia, setExperencia] = useState('');
-    const [habilidad, setHabilidad] = useState([]);
-    const [data, setData] = useState('')
 
     const processForm = (query_data) => {
-        setData(query_data);
         if (!query_data.niveleducativo || !query_data.experencia || habilidad.length === 0 || !query_data.ubicacion) {
             Swal.fire({
                 title: 'Error',
@@ -62,8 +62,37 @@ export default function FormPage() {
             })
         } else {
             // Si todos los campos están completos, puedes continuar con el proceso
-            console.log(data);
-            
+            Swal.fire({
+                title: 'Esperando respuesta del servidor...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                button: true,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            })
+            getJobs(query_data.niveleducativo, query_data.experencia, query_data.habilidades, query_data.ubicacion)
+                .then((response) => {
+                    if (!response) {
+                        Swal.close()
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo obtener la información',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        })
+                    } else {
+                        console.log(response)
+                        Swal.close()
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'Se obtuvo la información correctamente',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        })
+                    }
+                })
         }
     }
 
@@ -141,7 +170,8 @@ export default function FormPage() {
                                         >
                                             <MenuItem value="1 año">&lt; 1 años</MenuItem>
                                             <MenuItem value="1 a  años">1 - 3 años</MenuItem>
-                                            <MenuItem value="mas de 3 años">&gt; 3 años</MenuItem>
+                                            <MenuItem value="3 a 5 años">3 - 5 años</MenuItem>
+                                            <MenuItem value="mas de 5 años">&gt; 5 años</MenuItem>
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -190,7 +220,6 @@ export default function FormPage() {
                                         BUSCAR
                                     </Button>
                                 </Grid>
-
                             </Grid>
                         </form>
                     </Box>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Box,
     Stack,
@@ -12,37 +12,17 @@ import {
     Select,
     OutlinedInput,
     Chip,
-    createTheme
 } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { useTheme } from '@mui/material/styles';
 import job from '../assets/images/job.svg';
 import Lottie from 'lottie-react';
 import developer from '../assets/animations/developer.json';
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
-
-const names = [
-    'JAVA',
-    'PYTHON',
-    'C++',
-    'C#',
-    'JAVASCRIPT',
-    'HTML',
-    'CSS',
-    'REACT',
-    'ANGULAR',
-    'Otros',
-];
+import { useForm } from 'react-hook-form';
+import { tema, MenuProps } from '../assets/theme';
+import { names } from '../assets/technologies';
+import Swal from 'sweetalert2';
+import { getJobs } from '../api/routes';
 
 function getStyles(name, personName, theme) {
     return {
@@ -53,33 +33,90 @@ function getStyles(name, personName, theme) {
     };
 }
 
-const tema = createTheme({
-    typography: {
-        fontFamily: [
-            'Jost',
-            'sans-serif'
-        ].join(',')
-    }
-})
+export default function FormPage() {
 
-function FormPage() {
-
-    const [nivelEducativo, setNivelEducativo] = useState('');
     const theme = useTheme();
-    const [personName, setPersonName] = React.useState([]);
+    const [nivelEducativo, setNivelEducativo] = useState('');
+    const [experencia, setExperencia] = useState('');
+    const [habilidad, setHabilidad] = useState([]);
+
+    const { register, handleSubmit, setValue } = useForm(
+        {
+            defaultValues: {
+                niveleducativo: '',
+                experencia: '',
+                habilidades: '',
+                ubicacion: '',
+            }
+        }
+    )
+
+
+    const processForm = (query_data) => {
+        if (!query_data.niveleducativo || !query_data.experencia || habilidad.length === 0 || !query_data.ubicacion) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Por favor completa todos los campos',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            })
+        } else {
+            // Si todos los campos están completos, puedes continuar con el proceso
+            Swal.fire({
+                title: 'Esperando respuesta del servidor...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                button: true,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            })
+            getJobs(query_data.niveleducativo, query_data.experencia, query_data.habilidades, query_data.ubicacion)
+                .then((response) => {
+                    if (!response) {
+                        Swal.close()
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo obtener la información',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        })
+                    } else {
+                        console.log(response)
+                        Swal.close()
+                        Swal.fire({
+                            title: 'Éxito',
+                            text: 'Se obtuvo la información correctamente',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        })
+                    }
+                })
+        }
+    }
 
     const handleChangeSkill = (event) => {
         const {
             target: { value },
         } = event;
-        setPersonName(
+        setHabilidad(
             // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,
         );
+        setValue('habilidades', value);
     };
 
     const handleChangeNivelEducativo = (event) => {
-        setAge(event.target.value);
+        const { value } = event.target;
+        setValue('niveleducativo', value);
+        setNivelEducativo(value);
+    };
+
+    const handleChangeExperiencia = (event) => {
+        const { value } = event.target;
+        setValue('experencia', value);
+        setExperencia(value);
     };
 
     return (
@@ -100,81 +137,91 @@ function FormPage() {
                                 color: "#3673AA"
                             }}
                         >COMPLETA LOS SIGUIENTES CAMPOS PARA COMENZAR TU BUSQUEDA</Typography>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="Nivel educativo">Nivel educativo</InputLabel>
-                                    <Select
-                                        labelId="Nivel educativo"
-                                        id="demo-simple-select"
-                                        value={nivelEducativo}
-                                        label="Nivel educativo"
-                                        onChange={handleChangeNivelEducativo}
-                                    >
-                                        <MenuItem value="ninguno">Ninguno</MenuItem>
-                                        <MenuItem value="bachiller">Bachiller</MenuItem>
-                                        <MenuItem value="tecnico">Tecnico</MenuItem>
-                                        <MenuItem value="tecnologo">Tecnologo</MenuItem>
-                                        <MenuItem value="universitario">Universitario</MenuItem>
-                                        <MenuItem value="posgrado">Posgrado</MenuItem>
-
-
-
-                                    </Select>
-                                </FormControl>
+                        <form onSubmit={handleSubmit(processForm)}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="Nivel educativo">Nivel educativo</InputLabel>
+                                        <Select
+                                            labelId="Nivel educativo"
+                                            id="nivel_educativo"
+                                            value={nivelEducativo}
+                                            label="Nivel educativo"
+                                            onChange={handleChangeNivelEducativo}
+                                        >
+                                            <MenuItem value="ninguno">Ninguno</MenuItem>
+                                            <MenuItem value="bachiller">Bachiller</MenuItem>
+                                            <MenuItem value="tecnico">Tecnico</MenuItem>
+                                            <MenuItem value="tecnologo">Tecnologo</MenuItem>
+                                            <MenuItem value="universitario">Universitario</MenuItem>
+                                            <MenuItem value="posgrado">Posgrado</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="Experencia">Experencia</InputLabel>
+                                        <Select
+                                            labelId="Experencia"
+                                            id="experencia"
+                                            value={experencia}
+                                            label="experencia"
+                                            onChange={handleChangeExperiencia}
+                                        >
+                                            <MenuItem value="1 año">&lt; 1 años</MenuItem>
+                                            <MenuItem value="1 a  años">1 - 3 años</MenuItem>
+                                            <MenuItem value="3 a 5 años">3 - 5 años</MenuItem>
+                                            <MenuItem value="mas de 5 años">&gt; 5 años</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <FormControl sx={{ width: "100%" }}>
+                                        <InputLabel id="demo-multiple-chip-label">Habilidades</InputLabel>
+                                        <Select
+                                            labelId="demo-multiple-chip-label"
+                                            id="demo-multiple-chip"
+                                            multiple
+                                            value={habilidad}
+                                            onChange={handleChangeSkill}
+                                            input={<OutlinedInput id="select-multiple-chip" label="Habilidades" />}
+                                            renderValue={(selected) => (
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                                    {selected.map((value) => (
+                                                        <Chip key={value} label={value} />
+                                                    ))}
+                                                </Box>
+                                            )}
+                                            MenuProps={MenuProps}
+                                        >
+                                            {names.map((name) => (
+                                                <MenuItem
+                                                    key={name}
+                                                    value={name}
+                                                    style={getStyles(name, habilidad, theme)}
+                                                >
+                                                    {name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        id="ubicacion"
+                                        label="Ubicación"
+                                        variant="outlined"
+                                        {...register('ubicacion')}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button type='submit' variant="contained" sx={{ background: "#3673AA", width: "30%" }}>
+                                        BUSCAR
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Experiencia"
-                                    variant="outlined"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControl sx={{ width: "100%" }}>
-                                    <InputLabel id="demo-multiple-chip-label">Habilidades</InputLabel>
-                                    <Select
-                                        labelId="demo-multiple-chip-label"
-                                        id="demo-multiple-chip"
-                                        multiple
-                                        value={personName}
-                                        onChange={handleChangeSkill}
-                                        input={<OutlinedInput id="select-multiple-chip" label="Habilidades" />}
-                                        renderValue={(selected) => (
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                                {selected.map((value) => (
-                                                    <Chip key={value} label={value} />
-                                                ))}
-                                            </Box>
-                                        )}
-                                        MenuProps={MenuProps}
-                                    >
-                                        {names.map((name) => (
-                                            <MenuItem
-                                                key={name}
-                                                value={name}
-                                                style={getStyles(name, personName, theme)}
-                                            >
-                                                {name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Ubicación"
-                                    variant="outlined"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Button variant="contained" sx={{ background: "#3673AA", width: "30%" }}>
-                                    BUSCAR
-                                </Button>
-                            </Grid>
-
-                        </Grid>
+                        </form>
                     </Box>
                     <Box sx={{ background: "#3673AA", width: "50%" }}>
                         <Stack
@@ -182,9 +229,9 @@ function FormPage() {
                             justifyContent="center"
                             spacing={3}
                             alignItems="center"
-                            sx={{height: "100%"}}
+                            sx={{ height: "100%" }}
                         >
-                            <Box sx={{ height : "2rem"}}>
+                            <Box sx={{ height: "2rem" }}>
                                 <img src={job} alt='job-icon' width={50} />
                             </Box>
                             <Typography
@@ -211,5 +258,3 @@ function FormPage() {
         </div>
     );
 }
-
-export default FormPage;

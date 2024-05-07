@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
-from gemini import evaluarPerfil
+from gemini import extraer_informacion_perfil
 from flask_cors import CORS
+
 
 
 app = Flask(__name__)
@@ -36,8 +37,9 @@ def get_jobs():
 
         # Evaluar el perfil del candidato
         try:
-            respuesta = evaluarPerfil(nivel_educativo, experiencia, tecnologias, ubicacion)
-            return jsonify({**respuesta, "success": True})
+            # Obtener todas las ofertas de trabajo para el perfil dado
+            ofertas = extraer_informacion_perfil(tecnologias, nivel_educativo, experiencia, ubicacion)
+            return jsonify({"ofertas": ofertas, "success": True})
         except Exception as e:
             return jsonify({"error": f"Error al evaluar el perfil del candidato: {str(e)}", "success": False}), 500
     else:

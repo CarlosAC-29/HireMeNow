@@ -12,6 +12,49 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
     height: 100vh;
-    padding: 5%;
-  }
+    padding: 3%;
+}
 
+.filtros {
+    height: 75%;
+    overflow: scroll;
+    overflow-x: hidden;
+    padding: 0 5%;
+}
+
+.filtros::-webkit-scrollbar {
+    background-color: #ffffff;
+    /* Color del pulgar de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Borde redondeado para el pulgar */
+    width: 10px;
+    /* Grosor de la barra de desplazamiento */
+}
+
+.filtros::-webkit-scrollbar-thumb {
+    background-color: #3673AA;
+    /* Color del pulgar de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Borde redondeado para el pulgar */
+}
+
+.jobs-list {
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+.jobs-list::-webkit-scrollbar {
+    background-color: #ffffff;
+    /* Color del pulgar de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Borde redondeado para el pulgar */
+    width: 10px;
+    /* Grosor de la barra de desplazamiento */
+}
+
+.jobs-list::-webkit-scrollbar-thumb {
+    background-color: #3673AA;
+    /* Color del pulgar de la barra de desplazamiento */
+    border-radius: 5px;
+    /* Borde redondeado para el pulgar */
+}

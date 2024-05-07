@@ -40,3 +40,64 @@ def extraer_informacion_empleo(tecnologia, nivel, lugar):
                 lista_ofertas.append(oferta)
 
     return lista_ofertas
+
+def extraer_info_newPagina(tecnologia, lugar):
+    enlaces = []
+    try:
+        page = requests.get("https://co.trabajosdiarios.com/ofertas-trabajo/de-"+tecnologia+"/en-"+lugar)
+        soup = BeautifulSoup(page.text, 'html.parser')
+
+        target_div = soup.find('div', class_='text-secondary ps-1 mb-2 mt-1')
+        if target_div is None:
+            return None
+        result_divs = target_div.find_next_siblings('div', class_='card border-0 mb-3')
+
+        for div in result_divs:
+            links = div.find_all('a')
+            for link in links:
+                enlaces.append(link.get('href'))
+                
+    except requests.exceptions.RequestException as e:
+        print("Error al obtener la página:", e)
+    
+    return enlaces
+
+def obtener_contenido(url, tecnologia, lugar):
+    try:
+        response = requests.get("https://co.trabajosdiarios.com" + url)
+        response.raise_for_status()
+
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+
+        titulo_oferta = soup.find("h1", class_="text-primary pt-2 my-3 mx-2 fs-2")
+        description = soup.find('div', class_='col text-align-justify text-break').text.strip()
+
+        max_caracteres = 400
+        if len(description) > max_caracteres:
+            description = description[:max_caracteres] + "..."
+
+        if titulo_oferta is not None:
+            return {
+                "job_title": titulo_oferta.text,
+                "job_description_info": description,
+                "enlace": "https://co.trabajosdiarios.com" + url,
+                "tecnologia": tecnologia,
+                "lugar": lugar
+            }
+
+    except requests.exceptions.RequestException as e:
+        print("Error al obtener la página:", e)
+
+def infoTrabajosDiarios(tecnologia,lugar):
+    trabajo_links = extraer_info_newPagina(tecnologia, lugar)
+    print(trabajo_links)
+    trabajo_links = [trabajo for trabajo in trabajo_links if trabajo is not None]
+
+    for trabajo in trabajo_links:
+        if trabajo is not None:
+            return obtener_contenido(trabajo, tecnologia, lugar)
+    return ''
+
+
+

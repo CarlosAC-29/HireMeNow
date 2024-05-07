@@ -62,11 +62,12 @@ def evaluarPerfil(nivelEducacion, experiencia, tecnologias, ubicacion):
 
 def extraer_informacion_perfil(tecnologias, nivelEducacion, experiencia, ubicacion):
     perfil = evaluarPerfil(nivelEducacion, experiencia, tecnologias, ubicacion)
+    analisis = perfil["respuesta"]
     ofertas = []
     for tecnologia in tecnologias:
         ofertas_tecnologia = extraer_informacion_empleo(tecnologia, perfil["nivel"], ubicacion)
         ofertas.extend(ofertas_tecnologia)
-    return ofertas
+    return {"analisis": analisis, "ofertas": ofertas}
 
 
 

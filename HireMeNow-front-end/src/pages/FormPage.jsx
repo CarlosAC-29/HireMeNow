@@ -100,12 +100,12 @@ export default function FormPage() {
                         Swal.close()
                         Swal.fire({
                             title: 'Éxito',
-                            text: 'Se obtuvo la información correctamente',
+                            text: response.ofertas.analisis,
                             icon: 'success',
                             confirmButtonText: 'Aceptar'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                handleAceptar(response); // Llama a la función para establecer los datos
+                                handleAceptar(response.ofertas); // Llama a la función para establecer los datos
                             }
                         });
                     }

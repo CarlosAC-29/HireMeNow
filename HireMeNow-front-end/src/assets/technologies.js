@@ -1,0 +1,17 @@
+export const names = [
+    'java',
+    'python',
+    'c++',
+    'c#',
+    'javascript',
+    'html',
+    'css',
+    'react',
+    'angular',
+    'fullstack',
+    'frontend',
+    'backend',
+    'devops',
+    'qa',
+    'soporte',
+];

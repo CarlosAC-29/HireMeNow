@@ -2,6 +2,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 import json
+from webscrapping import extraer_informacion_empleo, extraer_info_newPagina
 
 load_dotenv()
 
@@ -54,6 +55,27 @@ def evaluarPerfil(nivelEducacion, experiencia, tecnologias, ubicacion):
     respuesta_json = json.loads(respuesta_sin_etiquetas)
 
     return respuesta_json
+
+# prueba = evaluarPerfil("universitario", "10 año", ["Python", "Java"], "Cali, valle del cauca")
+# print(prueba["nivel"])
+# print(prueba["tecnologias"])
+
+def extraer_informacion_perfil(tecnologias, nivelEducacion, experiencia, ubicacion):
+    perfil = evaluarPerfil(nivelEducacion, experiencia, tecnologias, ubicacion)
+    analisis = perfil["respuesta"]
+    ofertas = []
+    for tecnologia in tecnologias:
+        ofertas_tecnologia = extraer_informacion_empleo(tecnologia, perfil["nivel"], ubicacion)
+        ofertas_tecnologia_miEmpleo = extraer_info_newPagina(tecnologia, ubicacion)
+        print(ofertas_tecnologia_miEmpleo)
+        if ofertas_tecnologia_miEmpleo:
+            ofertas.extend(ofertas_tecnologia_miEmpleo)
+        if ofertas_tecnologia:
+            ofertas.extend(ofertas_tecnologia)
+
+    return {"analisis": analisis, "ofertas": ofertas}
+
+
 
 
 

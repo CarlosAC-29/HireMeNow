@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import {
     Box,
     Stack,
@@ -23,6 +23,8 @@ import { tema, MenuProps } from '../assets/theme';
 import { names } from '../assets/technologies';
 import Swal from 'sweetalert2';
 import { getJobs } from '../api/routes';
+import { JobContext } from '../context/JobContext';
+import { useNavigate } from 'react-router-dom';
 
 function getStyles(name, personName, theme) {
     return {
@@ -33,12 +35,17 @@ function getStyles(name, personName, theme) {
     };
 }
 
-export default function FormPage() {
 
+
+
+export default function FormPage() {
+    const navigate = useNavigate();
+    const { handleJobs } = useContext(JobContext);
     const theme = useTheme();
     const [nivelEducativo, setNivelEducativo] = useState('');
     const [experencia, setExperencia] = useState('');
     const [habilidad, setHabilidad] = useState([]);
+
 
     const { register, handleSubmit, setValue } = useForm(
         {
@@ -50,6 +57,12 @@ export default function FormPage() {
             }
         }
     )
+
+    const handleAceptar = (response) => {
+        handleJobs(response);
+        navigate('/empleos');
+    };
+
 
 
     const processForm = (query_data) => {
@@ -87,10 +100,14 @@ export default function FormPage() {
                         Swal.close()
                         Swal.fire({
                             title: 'Éxito',
-                            text: 'Se obtuvo la información correctamente',
+                            text: response.ofertas.analisis,
                             icon: 'success',
                             confirmButtonText: 'Aceptar'
-                        })
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                handleAceptar(response.ofertas); // Llama a la función para establecer los datos
+                            }
+                        });
                     }
                 })
         }

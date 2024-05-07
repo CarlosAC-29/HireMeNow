@@ -8,5 +8,10 @@ export const names = [
     'CSS',
     'REACT',
     'ANGULAR',
-    'Otros',
+    'Fullstack',
+    'Frontend',
+    'Backend',
+    'DevOps',
+    'QA',
+    'Soporte',
 ];

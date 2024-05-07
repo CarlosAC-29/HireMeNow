@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import './styles/Empleos.css';
 import {
     Box,
@@ -16,8 +16,14 @@ import {
 import { ThemeProvider } from '@emotion/react';
 import { tema } from '../assets/theme';
 import SearchIcon from '@mui/icons-material/Search';
+import { JobContext } from '../context/JobContext';
 
 function Empleos() {
+
+    const { jobs } = useContext(JobContext);
+    const job_option = jobs.ofertas;
+    console.log(job_option);
+
     const [aprendizChecked, setAprendizChecked] = useState(false);
     const [juniorChecked, setJuniorChecked] = useState(false);
     const [intermedioChecked, setIntermedioChecked] = useState(false);
@@ -28,9 +34,33 @@ function Empleos() {
     const [devops, setDevopsChecked] = useState(false);
     const [qa, setQAChecked] = useState(false);
     const [soporte, setSoporteChecked] = useState(false);
-    const [buscar, setBuscar] = useState(''); // Add state variables for other checkboxes here
+    const [buscar, setBuscar] = useState('');
+    const [filteredJobs, setFilteredJobs] = useState(job_option);
 
-    // Define state variables for other checkboxes
+    const filterJobs = () => {
+        const filtered = job_option.filter(job => {
+
+            // Filtramos por nivel, cargo y también por título de trabajo
+            if ((aprendizChecked && job.nivel === "aprendiz") ||
+                (juniorChecked && job.nivel === "junior") ||
+                (intermedioChecked && job.nivel === "mid") ||
+                (seniorChecked && job.nivel === "senior") ||
+                (frontend && job.tecnologia === "frontend") ||
+                (backend && job.tecnologia === "backend") ||
+                (fullstack && job.tecnologia === "fullstack") ||
+                (devops && job.tecnologia === "devops") ||
+                (qa && job.tecnologia === "qa") ||
+                (soporte && job.tecnologia === "soporte") ||
+                (job.job_title.includes(buscar))) { // Verificamos si el título del trabajo incluye la búsqueda
+                return true;
+            }
+
+            // Agrega condiciones de filtrado adicionales aquí si es necesario
+
+            return false;
+        });
+        setFilteredJobs(filtered);
+    }
 
     const handleChangeAprendiz = (event) => {
         setAprendizChecked(event.target.checked);
@@ -76,30 +106,16 @@ function Empleos() {
         setBuscar(event.target.value);
     };
 
-    const handleSubmitBuscar = () => {
-        // Handle search here
-        console.log(buscar);
-    }
+
 
     const handleSubmitFiltro = () => {
-        // Gather checkbox values and handle them here
-        console.log("Aprendiz:", aprendizChecked);
-        console.log("Junior:", juniorChecked);
-        console.log("MId:", intermedioChecked);
-        console.log("Senior:", seniorChecked);
-        console.log("Frontend:", frontend);
-        console.log("Backend:", backend);
-        console.log("Fullstack:", fullstack);
-        console.log("DevOps:", devops);
-        console.log("QA:", qa);
-        console.log("Soporte:", soporte);
-        // Handle other checkboxes here
+        filterJobs();
     };
 
     return (
         <ThemeProvider theme={tema}>
             <div className='main-box'>
-                <Stack direction="column" spacing={2} sx={{ padding: "1rem", width: "30%" }}>
+                <Stack direction="column" spacing={2} sx={{ width: "30%" }}>
                     <Box sx={{ background: "#FFFFFF", borderRadius: "0.8rem", height: "100%", padding: "1rem" }}>
                         <Paper
                             component="form"
@@ -112,7 +128,7 @@ function Empleos() {
                                 value={buscar}
                                 onChange={handleInputChange}
                             />
-                            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSubmitBuscar}>
+                            <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSubmitFiltro}>
                                 <SearchIcon />
                             </IconButton>
                         </Paper>
@@ -146,15 +162,25 @@ function Empleos() {
                         </div>
                     </Box>
                 </Stack>
-                <Stack sx={{ width: "100%", alignItems: "center" }}>
-                    <Box sx={{ background: "#FFFFFF", width: "70%", borderRadius: "0.8rem" }}>
-                        <Stack direction="column" spacing={2} sx={{ padding: "1rem" }}>
-                            <Typography sx={{ fontSize: "1.4rem", color: "#3673AA", fontWeight: "bold" }}>Titulo de empleo</Typography>
-                            <Typography sx={{ fontSize: ".9rem" }}>Multinacional española especializada en soluciones Smart City ( Portales, dispositivos hardware en vía pública, comunicaciones, IA, etc...) está en proceso de selección de programadores Angular Full Stack. Los profesionales seleccionados se incorporarán a un equipo internacional...</Typography>
-                            <Button variant="contained" sx={{ background: "#3673AA", width: "10%", height: "2rem" }}>Visitar</Button>
-                        </Stack>
-                    </Box>
-                </Stack>
+                <div className='jobs-list'>
+                    <Stack direction="column" spacing={5} sx={{ width: "100%", alignItems: "center" }}>
+                        {filteredJobs.map((job, index) => (
+                            <Box key={index} sx={{ background: "#FFFFFF", width: "60%", borderRadius: "0.8rem" }}>
+                                <Stack direction="column" spacing={2} sx={{ padding: "1rem" }}>
+                                    <Typography sx={{ fontSize: "1.4rem", color: "#3673AA", fontWeight: "bold" }}>
+                                        {job.job_title}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: ".9rem" }}>
+                                        {job.job_description_info && job.job_description_info.length > 400 ? `${job.job_description_info.substring(0, 400)}...` : job.job_description_info}
+                                    </Typography>
+                                    <Button href={job.enlace} target="_blank" rel="noopener noreferrer" variant="contained" sx={{ background: "#3673AA", width: "10%", height: "2rem" }}>
+                                        Visitar
+                                    </Button>
+                                </Stack>
+                            </Box>
+                        ))}
+                    </Stack>
+                </div>
             </div>
         </ThemeProvider>
     )

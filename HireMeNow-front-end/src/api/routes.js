@@ -1,3 +1,7 @@
+
+const local = 'http://localhost:5000'
+const production = 'https://hiremenow-oceo.onrender.com'
+
 export const getJobs = async (nivel_educativo, experencia, habilidad, ubicacion) => {
     // Convertir todas las variables a minúsculas
     nivel_educativo = nivel_educativo.toLowerCase();
@@ -13,7 +17,7 @@ export const getJobs = async (nivel_educativo, experencia, habilidad, ubicacion)
         ubicacion: ubicacion
     }
     console.log(data)
-    const response = await fetch('http://localhost:5000/getjobs', {
+    const response = await fetch(`${production}/getjobs`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

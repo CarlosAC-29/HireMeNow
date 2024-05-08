@@ -25,6 +25,7 @@ function Empleos() {
 
     const { jobs } = useContext(JobContext);
     const job_option = jobs.ofertas;
+    console.log(job_option);
     const navigate = useNavigate();
 
     const [aprendizChecked, setAprendizChecked] = useState(false);

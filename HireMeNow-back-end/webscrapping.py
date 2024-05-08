@@ -46,7 +46,7 @@ def extraer_informacion_empleo(tecnologia, nivel, lugar):
     return lista_ofertas
 
 
-def extraer_info_newPagina(tecnologia, lugar):
+def extraer_info_newPagina(tecnologia, lugar, nivel):
     page = requests.get(
         "https://co.trabajosdiarios.com/ofertas-trabajo/de-"+tecnologia+"/en-"+lugar)
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -68,8 +68,7 @@ def extraer_info_newPagina(tecnologia, lugar):
         description = div.find_all(
             'div', class_='font_4 text-secondary')[-1].text.strip()
 
-        enlaces.append({"job_title": titulo, "job_description_info": description,"enlace": "https://co.trabajosdiarios.com/ofertas-trabajo/de-"+tecnologia+"/en-"+lugar, "tecnologia": tecnologia, "lugar": lugar})
+        enlaces.append({"job_title": titulo, "job_description_info": description,"enlace": "https://co.trabajosdiarios.com/ofertas-trabajo/de-"+tecnologia+"/en-"+lugar, "nivel": nivel, "tecnologia": tecnologia, "lugar": lugar})
     return enlaces
 
 
-print(extraer_info_newPagina("java", "valle-del-cauca"))

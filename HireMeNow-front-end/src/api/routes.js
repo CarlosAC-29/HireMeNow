@@ -1,5 +1,5 @@
 
-const local = 'http://localhost:5000'
+const local = 'http://localhost:8080'
 const production = 'https://hiremenow-oceo.onrender.com'
 
 export const getJobs = async (nivel_educativo, experencia, habilidad, ubicacion) => {
@@ -8,7 +8,6 @@ export const getJobs = async (nivel_educativo, experencia, habilidad, ubicacion)
     experencia = experencia.toLowerCase();
     ubicacion = ubicacion.toLowerCase();
 
-    ubicacion = ubicacion.replace(/\s+/g, '-');
 
     const data = {
         nivel_educativo: nivel_educativo,

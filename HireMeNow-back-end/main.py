@@ -27,6 +27,7 @@ def get_jobs():
 
         try:
             ofertas = extraer_informacion_perfil(tecnologias, nivel_educativo, experiencia, ubicacion)
+            print(ofertas)
             return jsonify({"ofertas": ofertas, "success": True})
         except Exception as e:
             return jsonify({"error": f"Error al evaluar el perfil del candidato: {str(e)}", "success": False}), 500
